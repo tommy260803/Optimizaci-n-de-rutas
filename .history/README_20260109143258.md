@@ -1,0 +1,90 @@
+# Optimización de Rutas con Algoritmos Genéticos
+
+Aplicación web para la optimización de rutas de reparto utilizando algoritmos genéticos.
+
+## 🚀 Características
+
+- Optimización de rutas con múltiples puntos de entrega
+- Visualización interactiva de rutas en un mapa
+- Ajuste de parámetros del algoritmo genético
+- Métricas en tiempo real
+- Exportación de resultados
+
+## 📋 Requisitos
+
+- Python 3.7 o superior
+- pip (gestor de paquetes de Python)
+
+## 🛠 Instalación
+
+1. Clona el repositorio:
+   ```bash
+   git clone [URL_DEL_REPOSITORIO]
+   cd ruta-al-repositorio
+   ```
+
+2. Crea un entorno virtual (recomendado):
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # En Windows: venv\Scripts\activate
+   ```
+
+3. Instala las dependencias:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## 🚦 Ejecución
+
+1. Inicia la aplicación:
+   ```bash
+   python main.py
+   ```
+
+2. Abre tu navegador y ve a:
+   ```
+   http://127.0.0.1:8050
+   ```
+
+## 🏗 Estructura del Proyecto
+
+```
+.
+├── app/                    # Código de la aplicación web
+│   ├── assets/            # Archivos estáticos (CSS, imágenes)
+│   ├── callbacks/         # Lógica de los callbacks de Dash
+│   ├── components/        # Componentes reutilizables
+│   └── layouts/           # Diseños de la interfaz
+├── data/                  # Datos de entrada (se generan automáticamente)
+├── resultados/            # Resultados de las optimizaciones
+├── src/                   # Código fuente del algoritmo genético
+│   ├── algoritmo_genetico.py
+│   ├── funciones_fitness.py
+│   ├── generador_datos.py
+│   ├── operadores_geneticos.py
+│   └── utils.py
+├── tests/                 # Pruebas unitarias
+├── config.py              # Configuración global
+├── main.py                # Punto de entrada
+└── requirements.txt       # Dependencias
+```
+
+## 🧪 Pruebas
+
+Para ejecutar las pruebas unitarias:
+
+```bash
+python -m unittest discover -s tests
+```
+
+## 📝 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
+
+## 🤝 Contribución
+
+Las contribuciones son bienvenidas. Por favor, lee nuestras pautas de contribución para más detalles.
+
+## 📧 Contacto
+
+Para consultas o soporte, por favor contacta a [TU_EMAIL].
