@@ -1,0 +1,185 @@
+"""
+Componentes de visualización de gráficos para la aplicación de optimización de rutas.
+"""
+import plotly.graph_objects as go
+from dash import dcc
+from typing import List, Dict, Any
+
+def crear_grafico_convergencia_vacio() -> go.Figure:
+    """
+    Crea un gráfico de convergencia vacío.
+
+    Returns:
+        go.Figure: Figura de Plotly con gráfico de convergencia vacío.
+    """
+    fig = go.Figure()
+
+    fig.update_layout(
+        title='Evolución del Fitness',
+        xaxis_title='Generación',
+        yaxis_title='Fitness',
+        template='plotly_white',
+        height=400,
+        margin={'l': 50, 'r': 20, 't': 50, 'b': 50},
+        showlegend=True,
+        legend={
+            'orientation': 'h',
+            'yanchor': 'bottom',
+            'y': 1.02,
+            'xanchor': 'right',
+            'x': 1
+        }
+    )
+
+    return fig
+
+def crear_grafico_sin_datos() -> go.Figure:
+    """
+    Crea un gráfico con mensaje informativo cuando no hay datos disponibles.
+
+    Returns:
+        go.Figure: Figura de Plotly con mensaje informativo.
+    """
+    fig = go.Figure()
+
+    # Agregar anotación de texto en el centro del gráfico
+    fig.add_annotation(
+        x=0.5,
+        y=0.5,
+        text="<b>📊 Sin Datos Disponibles</b><br><br>" +
+             "Ejecuta el algoritmo genético para<br>" +
+             "ver la evolución del fitness",
+        xref="paper",
+        yref="paper",
+        showarrow=False,
+        font=dict(
+            size=16,
+            color="#64748b",
+            family="Inter, sans-serif"
+        ),
+        align="center",
+        bgcolor="rgba(255, 255, 255, 0.9)",
+        bordercolor="#e2e8f0",
+        borderwidth=2,
+        borderpad=10
+    )
+
+    # Configurar layout básico
+    fig.update_layout(
+        title='Evolución del Fitness',
+        xaxis_title='Generación',
+        yaxis_title='Fitness',
+        template='plotly_white',
+        height=400,
+        margin={'l': 50, 'r': 20, 't': 50, 'b': 50},
+        showlegend=False
+    )
+
+    return fig
+
+def actualizar_grafico_convergencia(historial: List[Dict[str, Any]]) -> go.Figure:
+    """
+    Actualiza el gráfico de convergencia con datos del historial.
+    
+    Args:
+        historial: Lista de diccionarios con datos de cada generación.
+        
+    Returns:
+        go.Figure: Figura actualizada con los datos de convergencia.
+    """
+    if not historial:
+        return crear_grafico_convergencia_vacio()
+    
+    # Extraer datos del historial
+    generaciones = [h.get('generacion', 0) for h in historial]
+    mejores_fitness = [h.get('mejor_fitness', 0) for h in historial]
+    fitness_promedio = [h.get('fitness_promedio', 0) for h in historial]
+    
+    fig = go.Figure()
+    
+    # Agregar línea de mejor fitness
+    fig.add_trace(
+        go.Scatter(
+            x=generaciones,
+            y=mejores_fitness,
+            mode='lines+markers',
+            name='Mejor Fitness',
+            line=dict(color='green', width=2),
+            marker=dict(size=6)
+        )
+    )
+    
+    # Agregar línea de fitness promedio
+    fig.add_trace(
+        go.Scatter(
+            x=generaciones,
+            y=fitness_promedio,
+            mode='lines+markers',
+            name='Fitness Promedio',
+            line=dict(color='orange', width=2, dash='dash'),
+            marker=dict(size=4)
+        )
+    )
+    
+    # Actualizar layout
+    fig.update_layout(
+        title='Evolución del Fitness por Generación',
+        xaxis_title='Generación',
+        yaxis_title='Valor de Fitness',
+        template='plotly_white',
+        height=400,
+        margin={'l': 50, 'r': 20, 't': 50, 'b': 50},
+        showlegend=True,
+        legend={
+            'orientation': 'h',
+            'yanchor': 'bottom',
+            'y': 1.02,
+            'xanchor': 'right',
+            'x': 1
+        },
+        hovermode='x unified'
+    )
+    
+    return fig
+
+def crear_grafico_diversidad(datos_diversidad: List[Dict[str, Any]]) -> go.Figure:
+    """
+    Crea un gráfico de diversidad genética.
+    
+    Args:
+        datos_diversidad: Lista de diccionarios con datos de diversidad por generación.
+        
+    Returns:
+        go.Figure: Figura con el gráfico de diversidad.
+    """
+    if not datos_diversidad:
+        return go.Figure()
+    
+    # Extraer datos
+    generaciones = [d.get('generacion', 0) for d in datos_diversidad]
+    diversidades = [d.get('diversidad', 0) for d in datos_diversidad]
+    
+    fig = go.Figure()
+    
+    fig.add_trace(
+        go.Scatter(
+            x=generaciones,
+            y=diversidades,
+            mode='lines+markers',
+            name='Diversidad Genética',
+            line=dict(color='blue', width=2),
+            marker=dict(size=6)
+        )
+    )
+    
+    fig.update_layout(
+        title='Diversidad Genética de la Población',
+        xaxis_title='Generación',
+        yaxis_title='Diversidad (Desviación Estándar del Fitness)',
+        template='plotly_white',
+        height=350,
+        margin={'l': 50, 'r': 20, 't': 50, 'b': 50},
+        showlegend=True
+    )
+    
+    return fig
