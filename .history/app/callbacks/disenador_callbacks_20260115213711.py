@@ -327,7 +327,7 @@ def crear_interfaz_mapeo(columnas_df: List[str]) -> html.Div:
         dbc.Row([
             dbc.Col([
                 dbc.Button(
-                    "Aplicar Mapeo",
+                    "🔗 Aplicar Mapeo",
                     id="btn-aplicar-mapeo",
                     className="btn-custom btn-primary-custom w-100"
                 )
@@ -570,7 +570,7 @@ def actualizar_mapa_disenador(dataset_manual, dataset_csv, dataset_generado, tab
                 mode='markers',
                 marker=dict(size=15, color='red', symbol='marker'),
                 name='Depósito',
-                text=[f"{nombres[deposito_idx]}"],
+                text=[f"🏭 {nombres[deposito_idx]}"],
                 hovertemplate="%{text}<br>ID: %{customdata}<extra></extra>",
                 customdata=[ids[deposito_idx]]
             ))
@@ -596,7 +596,7 @@ def actualizar_mapa_disenador(dataset_manual, dataset_csv, dataset_generado, tab
                         symbol='marker'
                     ),
                     name='Clientes',
-                    text=[f"{nombre}<br>Demanda: {demanda}" for nombre, demanda in zip(clientes_nombres, clientes_demandas)],
+                    text=[f"📍 {nombre}<br>Demanda: {demanda}" for nombre, demanda in zip(clientes_nombres, clientes_demandas)],
                     hovertemplate="%{text}<br>ID: %{customdata}<extra></extra>",
                     customdata=clientes_ids
                 ))
@@ -615,7 +615,7 @@ def actualizar_mapa_disenador(dataset_manual, dataset_csv, dataset_generado, tab
                     symbol='marker'
                 ),
                 name='Puntos',
-                text=[f"{nombre}<br>Demanda: {demanda}" for nombre, demanda in zip(nombres, demandas)],
+                text=[f"📍 {nombre}<br>Demanda: {demanda}" for nombre, demanda in zip(nombres, demandas)],
                 hovertemplate="%{text}<br>ID: %{customdata}<extra></extra>",
                 customdata=ids
             ))
@@ -660,11 +660,11 @@ def actualizar_info_dataset(dataset_manual, dataset_csv, dataset_generado, tab_a
 
     if stats:
         stats_html = [
-            html.P(f"Total de puntos: {stats['n_puntos']}", className="small mb-1"),
-            html.P(f"Puntos de entrega: {stats['n_clientes']}", className="small mb-1"),
-            html.P(f"Demanda total: {stats['demanda_total']}", className="small mb-1"),
-            html.P(f"Demanda promedio: {stats['demanda_promedio']}", className="small mb-1"),
-            html.P(f"Área cubierta: {stats['area_lat']:.3f}° × {stats['area_lon']:.3f}°", className="small mb-1")
+            html.P(f"📍 Total de puntos: {stats['n_puntos']}", className="small mb-1"),
+            html.P(f"🏪 Puntos de entrega: {stats['n_clientes']}", className="small mb-1"),
+            html.P(f"📦 Demanda total: {stats['demanda_total']}", className="small mb-1"),
+            html.P(f"📊 Demanda promedio: {stats['demanda_promedio']}", className="small mb-1"),
+            html.P(f"🗺️ Área cubierta: {stats['area_lat']:.3f}° × {stats['area_lon']:.3f}°", className="small mb-1")
         ]
     else:
         stats_html = [html.P("Error calculando estadísticas", className="text-danger small")]
@@ -674,11 +674,11 @@ def actualizar_info_dataset(dataset_manual, dataset_csv, dataset_generado, tab_a
 
     if validacion["valido"]:
         color_val = "success"
-        icono_val = "✓"
+        icono_val = "✅"
         texto_val = "Dataset válido"
     else:
         color_val = "danger"
-        icono_val = "✗"
+        icono_val = "❌"
         texto_val = "Dataset inválido"
 
     validaciones_html = [

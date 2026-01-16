@@ -403,7 +403,7 @@ def _crear_panel_generar() -> dbc.Container:
                 dbc.Row([
                     dbc.Col([
                         dbc.Button(
-                            "Regenerar",
+                            "🔄 Regenerar",
                             id="btn-regenerar-dataset",
                             className="btn-custom btn-warning-custom w-100 mb-2",
                             disabled=True
@@ -411,13 +411,13 @@ def _crear_panel_generar() -> dbc.Container:
                     ], width=6),
                     dbc.Col([
                         dbc.Button(
-                            "Guardar Dataset",
+                            "💾 Guardar Dataset",
                             id="btn-guardar-generado",
                             className="btn-custom btn-success-custom w-100 mb-2",
                             disabled=True
                         ),
                         dbc.Button(
-                            "Usar en Optimización",
+                            "🚀 Usar en Optimización",
                             id="btn-usar-generado",
                             className="btn-custom btn-info-custom w-100",
                             disabled=True
@@ -445,7 +445,7 @@ def _crear_panel_info_disenador() -> dbc.Card:
         dbc.CardBody([
             # Estadísticas básicas
             html.Div([
-                html.H6("Estadísticas", className="mb-3"),
+                html.H6("📊 Estadísticas", className="mb-3"),
                 html.Div(id="stats-dataset", children=[
                     html.P("No hay dataset cargado", className="text-muted small")
                 ])
@@ -453,7 +453,7 @@ def _crear_panel_info_disenador() -> dbc.Card:
 
             # Validaciones
             html.Div([
-                html.H6("Validaciones", className="mb-3"),
+                html.H6("✅ Validaciones", className="mb-3"),
                 html.Div(id="validaciones-dataset", children=[
                     html.P("Las validaciones aparecerán aquí", className="text-muted small")
                 ])
@@ -461,21 +461,21 @@ def _crear_panel_info_disenador() -> dbc.Card:
 
             # Acciones rápidas
             html.Div([
-                html.H6("Acciones Rápidas", className="mb-3"),
+                html.H6("⚡ Acciones Rápidas", className="mb-3"),
                 dbc.Button(
-                    "Ver como Tabla",
+                    "📋 Ver como Tabla",
                     id="btn-ver-tabla-dataset",
                     className="btn-custom btn-outline-secondary btn-sm w-100 mb-2",
                     disabled=True
                 ),
                 dbc.Button(
-                    "Exportar CSV",
+                    "📥 Exportar CSV",
                     id="btn-exportar-dataset",
                     className="btn-custom btn-outline-secondary btn-sm w-100 mb-2",
                     disabled=True
                 ),
                 dbc.Button(
-                    "Cargar Dataset Anterior",
+                    "🔄 Cargar Dataset Anterior",
                     id="btn-cargar-anterior",
                     className="btn-custom btn-outline-secondary btn-sm w-100",
                     disabled=True

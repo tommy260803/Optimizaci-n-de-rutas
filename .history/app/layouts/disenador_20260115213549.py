@@ -181,7 +181,7 @@ def _crear_panel_importar() -> dbc.Container:
     return dbc.Container(fluid=True, children=[
         dbc.Row([
             dbc.Col([
-                html.H5("Importar Dataset desde CSV", className="mb-3"),
+                html.H5("📄 Importar Dataset desde CSV", className="mb-3"),
                 html.P(
                     "Sube un archivo CSV con tus datos de puntos de entrega. "
                     "El sistema detectará automáticamente las columnas.",
@@ -240,26 +240,26 @@ def _crear_panel_importar() -> dbc.Container:
                 dbc.Row([
                     dbc.Col([
                         dbc.Button(
-                            "Validar Datos",
+                            "🔍 Validar Datos",
                             id="btn-validar-csv",
                             className="btn-custom btn-warning-custom w-100 mb-2",
                             disabled=True
                         ),
                         dbc.Button(
-                            "Limpiar",
+                            "🗑️ Limpiar",
                             id="btn-limpiar-csv",
                             className="btn-custom btn-danger-custom w-100"
                         )
                     ], width=6),
                     dbc.Col([
                         dbc.Button(
-                            "Guardar Dataset",
+                            "💾 Guardar Dataset",
                             id="btn-guardar-csv",
                             className="btn-custom btn-success-custom w-100 mb-2",
                             disabled=True
                         ),
                         dbc.Button(
-                            "Usar en Optimización",
+                            "🚀 Usar en Optimización",
                             id="btn-usar-csv",
                             className="btn-custom btn-info-custom w-100",
                             disabled=True
@@ -285,7 +285,7 @@ def _crear_panel_generar() -> dbc.Container:
     return dbc.Container(fluid=True, children=[
         dbc.Row([
             dbc.Col([
-                html.H5("Generación Asistida de Datasets", className="mb-3"),
+                html.H5("🤖 Generación Asistida de Datasets", className="mb-3"),
                 html.P(
                     "Crea datasets personalizados usando plantillas predefinidas "
                     "o configura parámetros avanzados.",
@@ -300,7 +300,7 @@ def _crear_panel_generar() -> dbc.Container:
                             dbc.Col([
                                 dbc.Card([
                                     dbc.CardBody([
-                                        html.H6("Pequeño Comercio", className="card-title"),
+                                        html.H6("🏪 Pequeño Comercio", className="card-title"),
                                         html.P("10-15 puntos, demanda baja-moderada", className="card-text small"),
                                         dbc.Button(
                                             "Seleccionar",
@@ -314,7 +314,7 @@ def _crear_panel_generar() -> dbc.Container:
                             dbc.Col([
                                 dbc.Card([
                                     dbc.CardBody([
-                                        html.H6("Cadena de Suministro", className="card-title"),
+                                        html.H6("🏭 Cadena de Suministro", className="card-title"),
                                         html.P("20-30 puntos, demanda variable", className="card-text small"),
                                         dbc.Button(
                                             "Seleccionar",
@@ -328,7 +328,7 @@ def _crear_panel_generar() -> dbc.Container:
                             dbc.Col([
                                 dbc.Card([
                                     dbc.CardBody([
-                                        html.H6("Ciudad Completa", className="card-title"),
+                                        html.H6("🌆 Ciudad Completa", className="card-title"),
                                         html.P("40-50 puntos, distribución urbana", className="card-text small"),
                                         dbc.Button(
                                             "Seleccionar",
@@ -392,7 +392,7 @@ def _crear_panel_generar() -> dbc.Container:
                         ]),
 
                         dbc.Button(
-                            "Generar Dataset",
+                            "🎲 Generar Dataset",
                             id="btn-generar-dataset",
                             className="btn-custom btn-primary-custom w-100"
                         )
@@ -403,7 +403,7 @@ def _crear_panel_generar() -> dbc.Container:
                 dbc.Row([
                     dbc.Col([
                         dbc.Button(
-                            "Regenerar",
+                            "🔄 Regenerar",
                             id="btn-regenerar-dataset",
                             className="btn-custom btn-warning-custom w-100 mb-2",
                             disabled=True
@@ -411,13 +411,13 @@ def _crear_panel_generar() -> dbc.Container:
                     ], width=6),
                     dbc.Col([
                         dbc.Button(
-                            "Guardar Dataset",
+                            "💾 Guardar Dataset",
                             id="btn-guardar-generado",
                             className="btn-custom btn-success-custom w-100 mb-2",
                             disabled=True
                         ),
                         dbc.Button(
-                            "Usar en Optimización",
+                            "🚀 Usar en Optimización",
                             id="btn-usar-generado",
                             className="btn-custom btn-info-custom w-100",
                             disabled=True
@@ -445,7 +445,7 @@ def _crear_panel_info_disenador() -> dbc.Card:
         dbc.CardBody([
             # Estadísticas básicas
             html.Div([
-                html.H6("Estadísticas", className="mb-3"),
+                html.H6("📊 Estadísticas", className="mb-3"),
                 html.Div(id="stats-dataset", children=[
                     html.P("No hay dataset cargado", className="text-muted small")
                 ])
@@ -453,7 +453,7 @@ def _crear_panel_info_disenador() -> dbc.Card:
 
             # Validaciones
             html.Div([
-                html.H6("Validaciones", className="mb-3"),
+                html.H6("✅ Validaciones", className="mb-3"),
                 html.Div(id="validaciones-dataset", children=[
                     html.P("Las validaciones aparecerán aquí", className="text-muted small")
                 ])
@@ -461,21 +461,21 @@ def _crear_panel_info_disenador() -> dbc.Card:
 
             # Acciones rápidas
             html.Div([
-                html.H6("Acciones Rápidas", className="mb-3"),
+                html.H6("⚡ Acciones Rápidas", className="mb-3"),
                 dbc.Button(
-                    "Ver como Tabla",
+                    "📋 Ver como Tabla",
                     id="btn-ver-tabla-dataset",
                     className="btn-custom btn-outline-secondary btn-sm w-100 mb-2",
                     disabled=True
                 ),
                 dbc.Button(
-                    "Exportar CSV",
+                    "📥 Exportar CSV",
                     id="btn-exportar-dataset",
                     className="btn-custom btn-outline-secondary btn-sm w-100 mb-2",
                     disabled=True
                 ),
                 dbc.Button(
-                    "Cargar Dataset Anterior",
+                    "🔄 Cargar Dataset Anterior",
                     id="btn-cargar-anterior",
                     className="btn-custom btn-outline-secondary btn-sm w-100",
                     disabled=True

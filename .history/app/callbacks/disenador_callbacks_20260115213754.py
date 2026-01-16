@@ -674,11 +674,11 @@ def actualizar_info_dataset(dataset_manual, dataset_csv, dataset_generado, tab_a
 
     if validacion["valido"]:
         color_val = "success"
-        icono_val = "✓"
+        icono_val = "✅"
         texto_val = "Dataset válido"
     else:
         color_val = "danger"
-        icono_val = "✗"
+        icono_val = "❌"
         texto_val = "Dataset inválido"
 
     validaciones_html = [
