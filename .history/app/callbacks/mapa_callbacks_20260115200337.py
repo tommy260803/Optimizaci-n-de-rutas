@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Tuple, Any
 
 # Importar componentes de visualización
 from app.components.mapa import crear_mapa_completo
-from src.utils import convertir_ruta_a_coordenadas
+from app.components.tablas import convertir_ruta_a_coordenadas
 
 def registrar_mapa_callbacks(app):
     """

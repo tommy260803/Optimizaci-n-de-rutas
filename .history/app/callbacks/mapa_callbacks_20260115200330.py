@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Tuple, Any
 
 # Importar componentes de visualización
 from app.components.mapa import crear_mapa_completo
-from src.utils import convertir_ruta_a_coordenadas
+from app.components.tablas import convertir_ruta_a_coordenadas
 
 def registrar_mapa_callbacks(app):
     """
@@ -136,8 +136,8 @@ def registrar_mapa_callbacks(app):
                                       className="text-muted")
                 return crear_mapa_sin_datos(), info_sin_ruta
 
-            # Obtener la mejor ruta (menor fitness)
-            mejor_ruta = min(mejores_individuos, key=lambda x: x[1])[0]
+            # Tomar la mejor ruta (primera en la lista ordenada)
+            mejor_ruta = mejores_individuos[0]  # Solo la ruta, sin el fitness
 
             # Crear visualización completa
             from app.components.mapa import crear_visualizacion_ruta_completa

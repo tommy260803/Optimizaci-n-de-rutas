@@ -67,6 +67,4 @@ app = crear_app()
 # Para ejecución directa
 if __name__ == '__main__':
     logger.info("Iniciando servidor...")
-    port = int(os.environ.get('PORT', 8050))
-    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
-    app.run_server(debug=debug, host='0.0.0.0', port=port)
+    app.run_server(debug=True, host='0.0.0.0', port=8050)
