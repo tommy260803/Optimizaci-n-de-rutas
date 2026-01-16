@@ -15,229 +15,7 @@ from src.generador_datos import GeneradorDatos
 
 logger = logging.getLogger(__name__)
 
-# Callbacks para el diseñador de datasets
-
-@callback(
-    [Output("modal-editar-punto", "is_open"),
-     Output("store-punto-editando", "data"),
-     Output("input-nombre-punto", "value"),
-     Output("input-direccion-punto", "value"),
-     Output("input-demanda-punto", "value"),
-     Output("input-tiempo-servicio", "value"),
-     Output("input-ventana-inicio", "value"),
-     Output("input-ventana-fin", "value")],
-    [Input("mapa-disenador", "clickData"),
-     Input("btn-agregar-punto-manual", "n_clicks"),
-     Input("btn-cancelar-edicion", "n_clicks"),
-     Input("lista-puntos-manual", "children")],
-    [State("modal-editar-punto", "is_open"),
-     State("store-dataset-manual", "data")]
-)
-def manejar_click_mapa_disenador(click_data, btn_agregar, btn_cancelar, lista_puntos, modal_open, dataset_actual):
-    """
-    Maneja clicks en el mapa del diseñador para agregar/editar puntos.
-    """
-    triggered = ctx.triggered_id
-
-    if triggered == "btn-cancelar-edicion" or triggered == "lista-puntos-manual":
-        return False, None, "", "", 1, 15, "08:00", "18:00"
-
-    # Si es click en mapa o botón agregar
-    if triggered in ["mapa-disenador", "btn-agregar-punto-manual"]:
-        if triggered == "mapa-disenador" and click_data:
-            # Obtener coordenadas del click
-            lat = click_data['points'][0]['lat']
-            lon = click_data['points'][0]['lon']
-
-            # Crear nuevo punto
-            nuevo_punto = {
-                'id': len(dataset_actual) if dataset_actual else 1,
-                'nombre': f'Punto {len(dataset_actual) if dataset_actual else 1}',
-                'lat': lat,
-                'lon': lon,
-                'demanda': 1,
-                'tiempo_servicio': 15,
-                'ventana_inicio': '08:00',
-                'ventana_fin': '18:00'
-            }
-
-            return True, nuevo_punto, nuevo_punto['nombre'], "", nuevo_punto['demanda'], nuevo_punto['tiempo_servicio'], nuevo_punto['ventana_inicio'], nuevo_punto['ventana_fin']
-        elif triggered == "btn-agregar-punto-manual":
-            # Agregar punto manual (coordenadas por defecto cerca del centro)
-            nuevo_punto = {
-                'id': len(dataset_actual) if dataset_actual else 1,
-                'nombre': f'Punto {len(dataset_actual) if dataset_actual else 1}',
-                'lat': -8.1117,
-                'lon': -79.0288,
-                'demanda': 1,
-                'tiempo_servicio': 15,
-                'ventana_inicio': '08:00',
-                'ventana_fin': '18:00'
-            }
-
-            return True, nuevo_punto, nuevo_punto['nombre'], "", nuevo_punto['demanda'], nuevo_punto['tiempo_servicio'], nuevo_punto['ventana_inicio'], nuevo_punto['ventana_fin']
-
-    return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
-
-@callback(
-    Output("store-dataset-manual", "data"),
-    [Input("btn-guardar-edicion", "n_clicks"),
-     Input("btn-limpiar-manual", "n_clicks")],
-    [State("store-dataset-manual", "data"),
-     State("store-punto-editando", "data"),
-     State("input-nombre-punto", "value"),
-     State("input-direccion-punto", "value"),
-     State("input-demanda-punto", "value"),
-     State("input-tiempo-servicio", "value"),
-     State("input-ventana-inicio", "value"),
-     State("input-ventana-fin", "value")]
-)
-def guardar_punto_manual(btn_guardar, btn_limpiar, dataset_actual, punto_editando, nombre, direccion, demanda, tiempo_servicio, ventana_inicio, ventana_fin):
-    """
-    Guarda un punto editado en el dataset manual.
-    """
-    if not ctx.triggered:
-        return no_update
-
-    triggered = ctx.triggered_id
-
-    if triggered == "btn-limpiar-manual":
-        return []
-
-    if triggered == "btn-guardar-edicion" and punto_editando:
-        # Actualizar datos del punto
-        punto_actualizado = punto_editando.copy()
-        punto_actualizado.update({
-            'nombre': nombre or punto_editando.get('nombre', ''),
-            'direccion': direccion or '',
-            'demanda': demanda or 1,
-            'tiempo_servicio': tiempo_servicio or 15,
-            'ventana_inicio': ventana_inicio or '08:00',
-            'ventana_fin': ventana_fin or '18:00'
-        })
-
-        # Agregar o actualizar en el dataset
-        dataset = dataset_actual or []
-        punto_existente = next((p for p in dataset if p.get('id') == punto_editando.get('id')), None)
-
-        if punto_existente:
-            # Actualizar punto existente
-            for i, p in enumerate(dataset):
-                if p.get('id') == punto_editando.get('id'):
-                    dataset[i] = punto_actualizado
-                    break
-        else:
-            # Agregar nuevo punto
-            dataset.append(punto_actualizado)
-
-        return dataset
-
-    return no_update
-
-@callback(
-    Output("lista-puntos-manual", "children"),
-    Input("store-dataset-manual", "data")
-)
-def actualizar_lista_puntos(dataset):
-    """
-    Actualiza la lista visual de puntos agregados.
-    """
-    if not dataset:
-        return html.P("No hay puntos agregados aún", className="text-muted text-center")
-
-    items = []
-    for punto in dataset:
-        item = dbc.ListGroupItem([
-            html.Div([
-                html.Strong(f"{punto.get('nombre', f'Punto {punto.get('id', 0)}')}"),
-                html.Br(),
-                html.Small([
-                    f"ID: {punto.get('id', 0)} | ",
-                    ".3f"                    ".3f"                    f" | Demanda: {punto.get('demanda', 0)}"
-                ], className="text-muted"),
-                dbc.Button(
-                    "Editar",
-                    id={"type": "btn-editar-punto", "index": punto.get('id', 0)},
-                    className="btn btn-outline-primary btn-sm ms-2",
-                    size="sm"
-                ),
-                dbc.Button(
-                    "Eliminar",
-                    id={"type": "btn-eliminar-punto", "index": punto.get('id', 0)},
-                    className="btn btn-outline-danger btn-sm ms-1",
-                    size="sm"
-                )
-            ], className="d-flex justify-content-between align-items-center")
-        ], className="mb-2")
-        items.append(item)
-
-    return dbc.ListGroup(items)
-
-@callback(
-    Output("store-dataset-manual", "data", allow_duplicate=True),
-    Input({"type": "btn-eliminar-punto", "index": ALL}, "n_clicks"),
-    State("store-dataset-manual", "data"),
-    prevent_initial_call=True
-)
-def eliminar_punto_manual(btns_eliminar, dataset_actual):
-    """
-    Elimina un punto del dataset manual.
-    """
-    if not ctx.triggered or not dataset_actual:
-        return no_update
-
-    # Encontrar cuál botón fue presionado
-    triggered = ctx.triggered[0]
-    if triggered['value'] and 'index' in triggered:
-        id_punto = triggered['index']
-
-        # Filtrar el punto a eliminar
-        dataset_filtrado = [p for p in dataset_actual if p.get('id') != id_punto]
-
-        return dataset_filtrado
-
-    return no_update
-
-@callback(
-    [Output("modal-editar-punto", "is_open", allow_duplicate=True),
-     Output("store-punto-editando", "data", allow_duplicate=True),
-     Output("input-nombre-punto", "value", allow_duplicate=True),
-     Output("input-direccion-punto", "value", allow_duplicate=True),
-     Output("input-demanda-punto", "value", allow_duplicate=True),
-     Output("input-tiempo-servicio", "value", allow_duplicate=True),
-     Output("input-ventana-inicio", "value", allow_duplicate=True),
-     Output("input-ventana-fin", "value", allow_duplicate=True)],
-    Input({"type": "btn-editar-punto", "index": ALL}, "n_clicks"),
-    State("store-dataset-manual", "data"),
-    prevent_initial_call=True
-)
-def editar_punto_manual(btns_editar, dataset_actual):
-    """
-    Abre el modal para editar un punto existente.
-    """
-    if not ctx.triggered or not dataset_actual:
-        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
-
-    # Encontrar cuál botón fue presionado
-    triggered = ctx.triggered[0]
-    if triggered['value'] and 'index' in triggered:
-        id_punto = triggered['index']
-
-        # Buscar el punto en el dataset
-        punto = next((p for p in dataset_actual if p.get('id') == id_punto), None)
-        if punto:
-            return (
-                True,  # Abrir modal
-                punto,  # Datos del punto siendo editado
-                punto.get('nombre', ''),
-                punto.get('direccion', ''),
-                punto.get('demanda', 1),
-                punto.get('tiempo_servicio', 15),
-                punto.get('ventana_inicio', '08:00'),
-                punto.get('ventana_fin', '18:00')
-            )
-
-    return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
+# Funciones auxiliares para callbacks (sin decoradores para evitar conflictos)
 
 # Callbacks para importación CSV
 
@@ -526,13 +304,19 @@ def generar_dataset_asistido(btn_generar, config):
     [Input("store-dataset-manual", "data"),
      Input("store-datos-csv-procesados", "data"),
      Input("store-dataset-generado", "data"),
-     Input("tabs-disenador", "active_tab")]
+     Input("tabs-disenador", "active_tab")],
+    prevent_initial_call=False
 )
-def actualizar_mapa_disenador(dataset_manual, dataset_csv, dataset_generado, tab_activa):
+def actualizar_mapa_disenador(dataset_manual, dataset_csv, dataset_generado, tab_activa, mapa_id=None):
     """
     Actualiza el mapa del diseñador con los puntos actuales.
     """
-    from app.components.mapa import crear_mapa_base
+    import logging
+    logger = logging.getLogger(__name__)
+
+    logger.info(f"Callback actualizar_mapa_disenador ejecutado - Tab: {tab_activa}")
+
+    from app.components.mapa import crear_mapa_completo, crear_mapa_base
 
     # Determinar qué dataset mostrar según la pestaña activa
     dataset_activo = None
@@ -543,87 +327,66 @@ def actualizar_mapa_disenador(dataset_manual, dataset_csv, dataset_generado, tab
     elif tab_activa == "generar":
         dataset_activo = dataset_generado
 
+    # Si no hay dataset activo, devolver mapa base
     if not dataset_activo:
+        logger.info("No hay dataset activo, devolviendo mapa base")
         return crear_mapa_base()
 
     try:
-        import plotly.graph_objects as go
+        logger.info(f"Procesando dataset con {len(dataset_activo)} puntos")
 
-        # Crear mapa base
-        fig = crear_mapa_base()
+        # Convertir dataset a DataFrame de pandas
+        df_puntos = pd.DataFrame(dataset_activo)
 
-        # Agregar puntos
-        lats = [p.get('lat', 0) for p in dataset_activo]
-        lons = [p.get('lon', 0) for p in dataset_activo]
-        nombres = [p.get('nombre', f'Punto {p.get("id", 0)}') for p in dataset_activo]
-        demandas = [p.get('demanda', 0) for p in dataset_activo]
-        ids = [p.get('id', 0) for p in dataset_activo]
+        # Asegurar que las columnas necesarias existan
+        columnas_requeridas = ['id', 'nombre', 'lat', 'lon', 'demanda', 'tiempo_servicio', 'ventana_inicio', 'ventana_fin']
+        for col in columnas_requeridas:
+            if col not in df_puntos.columns:
+                if col == 'id':
+                    df_puntos[col] = range(len(df_puntos))
+                elif col in ['lat', 'lon']:
+                    df_puntos[col] = -8.1117 if col == 'lat' else -79.0288
+                elif col == 'demanda':
+                    df_puntos[col] = 1
+                elif col == 'tiempo_servicio':
+                    df_puntos[col] = 15
+                elif col == 'ventana_inicio':
+                    df_puntos[col] = '08:00'
+                elif col == 'ventana_fin':
+                    df_puntos[col] = '18:00'
+                else:
+                    df_puntos[col] = f'Valor por defecto'
 
-        # Separar depósito de clientes
-        deposito_idx = next((i for i, p in enumerate(dataset_activo) if p.get('id') == 0), None)
+        # Asegurar que el depósito tenga id=0 si existe
+        if 0 not in df_puntos['id'].values:
+            logger.info("Agregando depósito automáticamente")
+            deposito = pd.DataFrame([{
+                'id': 0,
+                'nombre': 'Depósito Central',
+                'lat': -8.1117,
+                'lon': -79.0288,
+                'demanda': 0,
+                'tiempo_servicio': 0,
+                'ventana_inicio': '08:00',
+                'ventana_fin': '18:00'
+            }])
+            df_puntos = pd.concat([deposito, df_puntos], ignore_index=True)
 
-        if deposito_idx is not None:
-            # Punto de depósito
-            fig.add_trace(go.Scattermapbox(
-                lat=[lats[deposito_idx]],
-                lon=[lons[deposito_idx]],
-                mode='markers',
-                marker=dict(size=15, color='red', symbol='marker'),
-                name='Depósito',
-                text=[f"{nombres[deposito_idx]}"],
-                hovertemplate="%{text}<br>ID: %{customdata}<extra></extra>",
-                customdata=[ids[deposito_idx]]
-            ))
+        # Convertir id a numérico para asegurar compatibilidad
+        df_puntos['id'] = pd.to_numeric(df_puntos['id'], errors='coerce')
 
-            # Puntos de clientes (excluyendo depósito)
-            clientes_lats = [lats[i] for i in range(len(lats)) if i != deposito_idx]
-            clientes_lons = [lons[i] for i in range(len(lons)) if i != deposito_idx]
-            clientes_nombres = [nombres[i] for i in range(len(nombres)) if i != deposito_idx]
-            clientes_demandas = [demandas[i] for i in range(len(demandas)) if i != deposito_idx]
-            clientes_ids = [ids[i] for i in range(len(ids)) if i != deposito_idx]
+        logger.info(f"DataFrame final tiene {len(df_puntos)} filas")
+        logger.info(f"IDs en dataset: {sorted(df_puntos['id'].unique())}")
 
-            if clientes_lats:
-                fig.add_trace(go.Scattermapbox(
-                    lat=clientes_lats,
-                    lon=clientes_lons,
-                    mode='markers',
-                    marker=dict(
-                        size=[max(8, min(20, d * 2)) for d in clientes_demandas],
-                        color=clientes_demandas,
-                        colorscale='Viridis',
-                        showscale=True,
-                        colorbar=dict(title="Demanda"),
-                        symbol='marker'
-                    ),
-                    name='Clientes',
-                    text=[f"{nombre}<br>Demanda: {demanda}" for nombre, demanda in zip(clientes_nombres, clientes_demandas)],
-                    hovertemplate="%{text}<br>ID: %{customdata}<extra></extra>",
-                    customdata=clientes_ids
-                ))
-        else:
-            # Si no hay depósito identificado, mostrar todos como clientes
-            fig.add_trace(go.Scattermapbox(
-                lat=lats,
-                lon=lons,
-                mode='markers',
-                marker=dict(
-                    size=[max(8, min(20, d * 2)) for d in demandas],
-                    color=demandas,
-                    colorscale='Viridis',
-                    showscale=True,
-                    colorbar=dict(title="Demanda"),
-                    symbol='marker'
-                ),
-                name='Puntos',
-                text=[f"{nombre}<br>Demanda: {demanda}" for nombre, demanda in zip(nombres, demandas)],
-                hovertemplate="%{text}<br>ID: %{customdata}<extra></extra>",
-                customdata=ids
-            ))
-
-        return fig
+        # Usar la función estándar para crear el mapa
+        mapa = crear_mapa_completo(df_puntos)
+        logger.info("Mapa creado exitosamente")
+        return mapa
 
     except Exception as e:
         logger.error(f"Error actualizando mapa diseñador: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return crear_mapa_base()
 
 # Callbacks para estadísticas y validaciones
@@ -753,8 +516,200 @@ def usar_dataset_en_optimizacion(btn_manual, btn_csv, btn_generado, dataset_manu
 # Función para registrar todos los callbacks del diseñador
 def registrar_callbacks_disenador(app):
     """
-    Registra todos los callbacks del diseñador de datasets.
+    Registra todos los callbacks del diseñador de datasets manualmente.
     """
-    # Los callbacks ya están definidos arriba con @callback
-    # Esta función existe por consistencia con el patrón del proyecto
-    pass
+    try:
+        # Importar aquí para evitar problemas de importación circular
+        from app.components.mapa import crear_mapa_completo, crear_mapa_base
+
+        # 1. Callback para agregar puntos directamente (click en mapa y botón)
+        @app.callback(
+            Output("store-dataset-manual", "data", allow_duplicate=True),
+            [Input("mapa-disenador", "clickData"),
+             Input("btn-agregar-punto-manual", "n_clicks")],
+            [State("store-dataset-manual", "data")],
+            prevent_initial_call=True
+        )
+        def agregar_punto_directo(click_data, btn_agregar, dataset_actual):
+            """
+            Agrega un punto directamente al dataset sin abrir modal.
+            """
+            from dash import ctx
+
+            triggered = ctx.triggered_id if ctx.triggered else None
+
+            if not triggered:
+                return no_update
+
+            # Inicializar dataset si no existe
+            if dataset_actual is None:
+                dataset_actual = []
+
+            if triggered == "mapa-disenador" and click_data:
+                # Obtener coordenadas del click
+                lat = click_data['points'][0]['lat']
+                lon = click_data['points'][0]['lon']
+
+                # Crear nuevo punto
+                nuevo_punto = {
+                    'id': len(dataset_actual) + 1,  # ID incremental
+                    'nombre': f'Punto {len(dataset_actual) + 1}',
+                    'lat': lat,
+                    'lon': lon,
+                    'demanda': 1,
+                    'tiempo_servicio': 15,
+                    'ventana_inicio': '08:00',
+                    'ventana_fin': '18:00'
+                }
+
+                # Agregar punto al dataset
+                dataset_actual.append(nuevo_punto)
+                print(f"DEBUG: Punto agregado por click en mapa: {nuevo_punto}")
+                return dataset_actual
+
+            elif triggered == "btn-agregar-punto-manual":
+                # Agregar punto manual (coordenadas por defecto cerca del centro)
+                nuevo_punto = {
+                    'id': len(dataset_actual) + 1,  # ID incremental
+                    'nombre': f'Punto {len(dataset_actual) + 1}',
+                    'lat': -8.1117 + (len(dataset_actual) * 0.001),  # Pequeña variación para no solapar
+                    'lon': -79.0288 + (len(dataset_actual) * 0.001),
+                    'demanda': 1,
+                    'tiempo_servicio': 15,
+                    'ventana_inicio': '08:00',
+                    'ventana_fin': '18:00'
+                }
+
+                # Agregar punto al dataset
+                dataset_actual.append(nuevo_punto)
+                print(f"DEBUG: Punto agregado por botón manual: {nuevo_punto}")
+                return dataset_actual
+
+            return no_update
+
+        # 2. Callback para actualizar la lista de puntos
+        @app.callback(
+            Output("lista-puntos-manual", "children"),
+            Input("store-dataset-manual", "data")
+        )
+        def actualizar_lista_puntos(dataset):
+            """
+            Actualiza la lista visual de puntos agregados.
+            """
+            if not dataset:
+                return html.P("No hay puntos agregados aún", className="text-muted text-center")
+
+            items = []
+            for punto in dataset:
+                item = dbc.ListGroupItem([
+                    html.Div([
+                        html.Strong(f"{punto.get('nombre', f'Punto {punto.get('id', 0)}')}"),
+                        html.Br(),
+                        html.Small([
+                            f"ID: {punto.get('id', 0)} | ",
+                            ".3f"                    ".3f"                    f" | Demanda: {punto.get('demanda', 0)}"
+                        ], className="text-muted"),
+                        dbc.Button(
+                            "Editar",
+                            id={"type": "btn-editar-punto", "index": punto.get('id', 0)},
+                            className="btn btn-outline-primary btn-sm ms-2",
+                            size="sm"
+                        ),
+                        dbc.Button(
+                            "Eliminar",
+                            id={"type": "btn-eliminar-punto", "index": punto.get('id', 0)},
+                            className="btn btn-outline-danger btn-sm ms-1",
+                            size="sm"
+                        )
+                    ], className="d-flex justify-content-between align-items-center")
+                ], className="mb-2")
+                items.append(item)
+
+            return dbc.ListGroup(items)
+
+        # 3. Callback para eliminar puntos
+        @app.callback(
+            Output("store-dataset-manual", "data", allow_duplicate=True),
+            Input({"type": "btn-eliminar-punto", "index": ALL}, "n_clicks"),
+            State("store-dataset-manual", "data"),
+            prevent_initial_call=True
+        )
+        def eliminar_punto_manual(btns_eliminar, dataset_actual):
+            """
+            Elimina un punto del dataset manual.
+            """
+            from dash import ctx
+
+            if not ctx.triggered or not dataset_actual:
+                return no_update
+
+            # Encontrar cuál botón fue presionado
+            triggered = ctx.triggered[0]
+            if triggered['value'] and 'index' in triggered:
+                id_punto = triggered['index']
+
+                # Filtrar el punto a eliminar
+                dataset_filtrado = [p for p in dataset_actual if p.get('id') != id_punto]
+
+                return dataset_filtrado
+
+            return no_update
+
+        # 4. Callback para editar puntos (abre modal)
+        @app.callback(
+            [Output("modal-editar-punto", "is_open", allow_duplicate=True),
+             Output("store-punto-editando", "data", allow_duplicate=True),
+             Output("input-nombre-punto", "value", allow_duplicate=True),
+             Output("input-direccion-punto", "value", allow_duplicate=True),
+             Output("input-demanda-punto", "value", allow_duplicate=True),
+             Output("input-tiempo-servicio", "value", allow_duplicate=True),
+             Output("input-ventana-inicio", "value", allow_duplicate=True),
+             Output("input-ventana-fin", "value", allow_duplicate=True)],
+            Input({"type": "btn-editar-punto", "index": ALL}, "n_clicks"),
+            State("store-dataset-manual", "data"),
+            prevent_initial_call=True
+        )
+        def editar_punto_manual(btns_editar, dataset_actual):
+            """
+            Abre el modal para editar un punto existente.
+            """
+            from dash import ctx
+
+            if not ctx.triggered or not dataset_actual:
+                return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
+            # Encontrar cuál botón fue presionado
+            triggered = ctx.triggered[0]
+            if triggered['value'] and 'index' in triggered:
+                id_punto = triggered['index']
+
+                # Buscar el punto en el dataset
+                punto = next((p for p in dataset_actual if p.get('id') == id_punto), None)
+                if punto:
+                    return (
+                        True,  # Abrir modal
+                        punto,  # Datos del punto siendo editado
+                        punto.get('nombre', ''),
+                        punto.get('direccion', ''),
+                        punto.get('demanda', 1),
+                        punto.get('tiempo_servicio', 15),
+                        punto.get('ventana_inicio', '08:00'),
+                        punto.get('ventana_fin', '18:00')
+                    )
+
+            return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
+        # 5. Callback para guardar punto editado
+        @app.callback(
+            Output("store-dataset-manual", "data"),
+            [Input("btn-guardar-edicion", "n_clicks"),
+             Input("btn-limpiar-manual", "n_clicks")],
+            [State("store-dataset-manual", "data"),
+             State("store-punto-editando", "data"),
+             State("input-nombre-punto", "value"),
+             State("input-direccion-punto", "value"),
+             State("input-demanda-punto", "value"),
+             State("input-tiempo-servicio", "value"),
+             State("input-ventana-inicio", "value"),
+             State("input-ventana-fin", "value")]
+        )
