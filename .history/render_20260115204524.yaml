@@ -2,7 +2,7 @@ services:
   - type: web
     name: optimizacion-rutas
     runtime: python
-    runtimeVersion: "3.13.4"
+    runtimeVersion: "3.11.7"
     buildCommand: pip install -r requirements.txt --only-binary=all
     startCommand: gunicorn --bind 0.0.0.0:$PORT app.app:app
     envVars:

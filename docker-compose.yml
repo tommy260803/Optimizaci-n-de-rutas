@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8050:8050"
+    environment:
+      - DEBUG=false
+    volumes:
+      - ./data:/app/data
+      - ./resultados:/app/resultados
+    restart: unless-stopped
